@@ -1,14 +1,20 @@
 import React from 'react';
+import useEth from '../contexts/EthContext/useEth';
 import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 
 import logo from '../assets/logo.png';
+import { useEffect } from 'react';
 
 const NavBarItem = ({ title, classprops }) => (
     <li className={`mx-4 cursor-pointer ${classprops}`}>{title}</li>
 );
 
 const Navbar = () => {
+    const {
+        state: { contract, accounts },
+    } = useEth();
+
     const [toggleMenu, setToggleMenu] = React.useState(false);
 
     return (
@@ -22,9 +28,12 @@ const Navbar = () => {
                         <NavBarItem key={item + index} title={item} />
                     )
                 )}
-                <li className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
+                <button
+                    onClick={read}
+                    className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]"
+                >
                     Login
-                </li>
+                </button>
             </ul>
             <div className="flex relative">
                 {!toggleMenu && (

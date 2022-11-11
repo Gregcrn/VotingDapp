@@ -33,7 +33,7 @@ const Welcome = () => {
                         Make your voice heard <br /> around the world
                     </h1>
                     <p className="text-left mt-5 text-white font-light md:w-9/12 w-11/12 text-base">
-                        The best Voting App for your needs.
+                        The best Voting App for your needs with your ETH Card.
                     </p>
                     <button
                         type="button"
