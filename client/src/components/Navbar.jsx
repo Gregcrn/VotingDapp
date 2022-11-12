@@ -1,10 +1,9 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import useEth from '../contexts/EthContext/useEth';
 import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 
 import logo from '../assets/logo.png';
-import { useEffect } from 'react';
 
 const NavBarItem = ({ title, classprops }) => (
     <li className={`mx-4 cursor-pointer ${classprops}`}>{title}</li>
@@ -15,7 +14,34 @@ const Navbar = () => {
         state: { contract, accounts },
     } = useEth();
 
-    const [toggleMenu, setToggleMenu] = React.useState(false);
+    useEffect(() => {
+        async function getOwner() {
+            if (contract) {
+                const myOwner = await contract.methods.owner().call();
+                setOwner(myOwner);
+            }
+        }
+        async function currentAccount() {
+            if (accounts) {
+                setCurrentAccount(await accounts[0]);
+            }
+        }
+        getOwner();
+        currentAccount();
+    }, [contract, accounts]);
+
+    const [toggleMenu, setToggleMenu] = useState(false);
+    const [owner, setOwner] = useState('');
+    const [currentAccount, setCurrentAccount] = useState('');
+    const [isOwner, setIsOwner] = useState(false);
+
+    useEffect(() => {
+        if (currentAccount === owner) {
+            setIsOwner(true);
+        } else {
+            setIsOwner(false);
+        }
+    }, [currentAccount, owner, contract, accounts]);
 
     return (
         <nav className="w-full flex md:justify-center justify-between items-center p-4">
@@ -28,12 +54,11 @@ const Navbar = () => {
                         <NavBarItem key={item + index} title={item} />
                     )
                 )}
-                <button
-                    onClick={read}
-                    className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]"
-                >
-                    Login
-                </button>
+                {isOwner && (
+                    <button className="bg-[#2952e3] py-2 px-7 mx-4 rounded-full cursor-pointer hover:bg-[#2546bd]">
+                        Login
+                    </button>
+                )}
             </ul>
             <div className="flex relative">
                 {!toggleMenu && (

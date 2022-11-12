@@ -1,18 +1,10 @@
-import { Navbar, Welcome, Footer, Services, Transactions } from './components';
+import Interface from './components/Interface';
 import EthProvider from './contexts/EthContext/EthProvider';
 
 const App = () => {
     return (
         <EthProvider>
-            <div className="min-h-screen">
-                <div className="gradient-bg-welcome">
-                    <Navbar />
-                    <Welcome />
-                </div>
-                <Services />
-                <Transactions />
-                <Footer />
-            </div>
+            <Interface />
         </EthProvider>
     );
 };
