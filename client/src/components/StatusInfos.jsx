@@ -6,6 +6,7 @@ const StatusInfos = ({
     rawStatus,
     currentStatusDesc,
     nextStatusDescription,
+    owner,
 }) => {
     const {
         state: { contract },
@@ -14,27 +15,23 @@ const StatusInfos = ({
     async function startProposalsRegistering() {
         return await contract.methods
             .startProposalsRegistering()
-            .send({ from: contract.methods.owner().call() });
+            .send({ from: owner });
     }
     async function endProposalsRegistering() {
         return await contract.methods
             .endProposalsRegistering()
-            .send({ from: contract.methods.owner().call() });
+            .send({ from: owner });
     }
     async function startVotingSession() {
         return await contract.methods
             .startVotingSession()
-            .send({ from: contract.methods.owner().call() });
+            .send({ from: owner });
     }
     async function endVotingSession() {
-        return await contract.methods
-            .endVotingSession()
-            .send({ from: contract.methods.owner().call() });
+        return await contract.methods.endVotingSession().send({ from: owner });
     }
     async function startResultsSession() {
-        return await contract.methods
-            .tallyVotes()
-            .send({ from: contract.methods.owner().call() });
+        return await contract.methods.tallyVotes().send({ from: owner });
     }
 
     useEffect(() => {
@@ -58,10 +55,6 @@ const StatusInfos = ({
                 break;
         }
     }, [contract]);
-
-    // console.log('changeStatus', changeStatus);
-    // console.log('rawStatus', rawStatus);
-
     return (
         <div className="w-full">
             <p className="text-lg text-slate-300 text-left underline decoration-pink-500/30 decoration-4 mb-3 ">
@@ -91,7 +84,26 @@ const StatusInfos = ({
                 <div className="text-sm font-normal w-full">
                     <p className="text-center">{currentStatusDesc}</p>
                 </div>
-                <button className="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800">
+                <button
+                    onClick={() => {
+                        if (rawStatus === 0) {
+                            startProposalsRegistering();
+                        }
+                        if (rawStatus === 1) {
+                            endProposalsRegistering();
+                        }
+                        if (rawStatus === 2) {
+                            startVotingSession();
+                        }
+                        if (rawStatus === 3) {
+                            endVotingSession();
+                        }
+                        if (rawStatus === 4) {
+                            startResultsSession();
+                        }
+                    }}
+                    className="relative inline-flex items-center justify-center p-0.5 mb-2 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-green-400 to-blue-600 group-hover:from-green-400 group-hover:to-blue-600 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800"
+                >
                     <span className="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
                         {nextStatusDescription}
                     </span>

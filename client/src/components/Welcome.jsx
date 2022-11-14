@@ -8,46 +8,18 @@ import { BsInfoCircle } from 'react-icons/bs';
 import Progress from './Progress';
 import WorkflowTab from './WorkflowTab';
 import StatusInfos from './StatusInfos';
+import OwnerForm from './OwnerForm';
+import VoterForm from './VoterForm';
+import NotRegistered from './NotRegistered';
+
+// utils
+import { isInList } from '../utils/contractUtils';
 
 import { shortenAddress } from '../utils/shortenAddress';
 
 const companyCommonStyles =
     'min-h-[70px] sm:px-0 px-2 sm:min-w-[120px] flex justify-center items-center border-[0.5px] border-gray-400 text-sm font-light text-white';
 
-const OwnerForm = ({
-    handleChange,
-    value,
-    addVoter,
-    placeholder,
-    type,
-    name,
-}) => (
-    <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
-        <h1 className="mb-4 text-1xl font-extrabold text-gray-900 dark:text-white md:text-3xl lg:text-3xl">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-sky-400">
-                Admin
-            </span>{' '}
-        </h1>
-        <p className="text-md font-normal text-gray-500 lg:text-xl dark:text-gray-400">
-            Enter the address of voter
-        </p>
-        <input
-            placeholder={placeholder}
-            type={type}
-            value={value}
-            name={name}
-            onChange={(e) => handleChange(e, name)}
-            className="my-2 w-full rounded-sm p-2 outline-none bg-transparent text-white border-none text-sm white-glassmorphism"
-        />
-        <button
-            onClick={addVoter}
-            type="button"
-            className="text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 mt-4 shadow-xl shadow-cyan-400/30 "
-        >
-            Add Voter
-        </button>
-    </div>
-);
 const Welcome = () => {
     const [owner, setOwner] = useState('');
     const [isOwner, setIsOwner] = useState(false);
@@ -58,6 +30,8 @@ const Welcome = () => {
     const [addressOfVoter, setAddressOfVoter] = useState('');
     const [allVoters, setAllVoters] = useState();
     const [nextStatusDescription, setNextStatus] = useState('');
+    const [isVoter, setIsVoter] = useState(false);
+    const [proposalOfVoter, setProposalOfVoter] = useState('');
 
     const {
         state: { contract, accounts },
@@ -95,6 +69,13 @@ const Welcome = () => {
             setIsOwner(true);
         } else {
             setIsOwner(false);
+        }
+        if (allVoters && currentAccount) {
+            if (isInList(allVoters, currentAccount)) {
+                setIsVoter(true);
+            } else {
+                setIsVoter(false);
+            }
         }
     }, [currentAccount, owner, contract, accounts]);
 
@@ -137,6 +118,11 @@ const Welcome = () => {
         setAddressOfVoter(e.currentTarget.value);
     };
 
+    const handleChangeProposal = (e) => {
+        e.preventDefault();
+        setProposalOfVoter(e.currentTarget.value);
+    };
+
     async function getvoters() {
         if (contract) {
             let allVoters = await contract.getPastEvents('VoterRegistered', {
@@ -161,26 +147,21 @@ const Welcome = () => {
             await contract.methods
                 .addVoter(addressOfVoter)
                 .send({ from: owner });
+            setAddressOfVoter('');
             getvoters();
         }
     };
 
-    const changeStatus = async (status) => {
-        if (status === 0) {
-            await contract.methods
-                .startProposalsRegistering()
-                .send({ from: owner });
-        }
-        if (status === 1) {
-            await contract.methods
-                .endProposalsRegistering()
-                .send({ from: owner });
-        }
-        if (status === 2) {
-            await contract.methods.startVotingSession().send({ from: owner });
-        }
-        if (status === 3) {
-            await contract.methods.endVotingSession().send({ from: owner });
+    const addProposal = async () => {
+        if (proposalOfVoter === '') {
+            alert('Please enter a valid proposal');
+            return;
+        } else {
+            console.log(proposalOfVoter);
+            setProposalOfVoter('');
+            // await contract.methods.addProposal(proposalOfVoter).send({
+            //     from: currentAccount,
+            // });
         }
     };
 
@@ -200,6 +181,7 @@ const Welcome = () => {
                             currentStatusDesc={currentStatusDesc}
                             nextStatusDescription={nextStatusDescription}
                             rawStatus={currentStatus}
+                            owner={owner}
                         />
                         <Progress progress={progress} />
                         <WorkflowTab allVoters={allVoters} />
@@ -224,7 +206,7 @@ const Welcome = () => {
                             </div>
                         </div>
                     </div>
-                    {isOwner && (
+                    {isOwner ? (
                         <>
                             <OwnerForm
                                 placeholder="Enter the address of voter"
@@ -235,7 +217,24 @@ const Welcome = () => {
                                 addVoter={addVoter}
                             />
                         </>
-                    )}
+                    ) : null}
+                    {isVoter ? (
+                        <>
+                            <VoterForm
+                                placeholder="Enter your proposal"
+                                type="text"
+                                value={proposalOfVoter}
+                                name="proposalOfVoter"
+                                handleChange={handleChangeProposal}
+                                addProposal={addProposal}
+                            />
+                        </>
+                    ) : null}
+                    {!isOwner && !isVoter ? (
+                        <>
+                            <NotRegistered />
+                        </>
+                    ) : null}
                 </div>
             </div>
         </>
