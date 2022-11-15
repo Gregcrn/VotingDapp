@@ -8,14 +8,20 @@ function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
 }
 
-export default function WorkflowTab({ allVoters }) {
+export default function WorkflowTab({ allVoters, allProposals }) {
     let [process] = [
         {
             Voters: allVoters,
-            Proposal: [],
+            Proposal: allProposals,
             Winner: [],
         },
     ];
+
+    console.log(allProposals);
+
+    async function VoteFortheProposal() {
+        console.log(allProposals);
+    }
 
     return (
         <div className="w-full max-w-xl px-2 py-1 mt-7 ">
@@ -54,6 +60,13 @@ export default function WorkflowTab({ allVoters }) {
                                             <VotersListing
                                                 key={i}
                                                 addressOfVoter={voter.address}
+                                                proposalOfVoter={
+                                                    voter.description
+                                                }
+                                                voteCount={voter.voteCount}
+                                                VoteFortheProposal={
+                                                    VoteFortheProposal
+                                                }
                                             />
                                         );
                                     }

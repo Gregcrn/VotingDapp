@@ -34,27 +34,27 @@ const StatusInfos = ({
         return await contract.methods.tallyVotes().send({ from: owner });
     }
 
-    useEffect(() => {
-        switch (rawStatus) {
-            case 0:
-                console.log('Next: Openning proposals registration');
-                break;
-            case 1:
-                console.log('Next :Proposals Registration ended');
-                break;
-            case 2:
-                console.log('Next : Openning voting session');
-                break;
-            case 3:
-                console.log('Next : Voting session ended');
-                break;
-            case 4:
-                console.log('Next : Opening results session');
-                break;
-            default:
-                break;
-        }
-    }, [contract]);
+    // useEffect(() => {
+    //     switch (rawStatus) {
+    //         case 0:
+    //             console.log('Next: Openning proposals registration');
+    //             break;
+    //         case 1:
+    //             console.log('Next :Proposals Registration ended');
+    //             break;
+    //         case 2:
+    //             console.log('Next : Openning voting session');
+    //             break;
+    //         case 3:
+    //             console.log('Next : Voting session ended');
+    //             break;
+    //         case 4:
+    //             console.log('Next : Opening results session');
+    //             break;
+    //         default:
+    //             break;
+    //     }
+    // }, [contract]);
     return (
         <div className="w-full">
             <p className="text-lg text-slate-300 text-left underline decoration-pink-500/30 decoration-4 mb-3 ">

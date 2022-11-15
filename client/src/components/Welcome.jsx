@@ -32,6 +32,7 @@ const Welcome = () => {
     const [nextStatusDescription, setNextStatus] = useState('');
     const [isVoter, setIsVoter] = useState(false);
     const [proposalOfVoter, setProposalOfVoter] = useState('');
+    const [allProposals, setAllProposals] = useState();
 
     const {
         state: { contract, accounts },
@@ -62,6 +63,7 @@ const Welcome = () => {
         getOwner();
         currentAccount();
         getvoters();
+        getAllProposals();
     }, [contract, accounts]);
 
     useEffect(() => {
@@ -113,16 +115,6 @@ const Welcome = () => {
         }
     }, [currentStatusDesc]);
 
-    const handleChange = (e) => {
-        e.preventDefault();
-        setAddressOfVoter(e.currentTarget.value);
-    };
-
-    const handleChangeProposal = (e) => {
-        e.preventDefault();
-        setProposalOfVoter(e.currentTarget.value);
-    };
-
     async function getvoters() {
         if (contract) {
             let allVoters = await contract.getPastEvents('VoterRegistered', {
@@ -157,12 +149,49 @@ const Welcome = () => {
             alert('Please enter a valid proposal');
             return;
         } else {
-            console.log(proposalOfVoter);
+            await contract.methods.addProposal(proposalOfVoter).send({
+                from: currentAccount,
+            });
             setProposalOfVoter('');
-            // await contract.methods.addProposal(proposalOfVoter).send({
-            //     from: currentAccount,
-            // });
         }
+    };
+
+    async function getProposal(idProposal) {
+        return await contract.methods.proposalsArray(idProposal).call();
+    }
+
+    async function getAllProposals() {
+        if (contract) {
+            let allProposals = await contract.getPastEvents(
+                'ProposalRegistered',
+                {
+                    fromBlock: 0,
+                    toBlock: 'latest',
+                }
+            );
+            let proposals = [];
+            for (const proposalEvent of allProposals) {
+                const proposal = await getProposal(
+                    proposalEvent.returnValues.proposalId
+                );
+                proposals.push({
+                    id: proposal,
+                    description: proposal.description,
+                    voteCount: proposal.voteCount,
+                });
+            }
+            setAllProposals(proposals);
+        }
+    }
+
+    const handleChange = (e) => {
+        e.preventDefault();
+        setAddressOfVoter(e.currentTarget.value);
+    };
+
+    const handleChangeProposal = (e) => {
+        e.preventDefault();
+        setProposalOfVoter(e.currentTarget.value);
     };
 
     return (
@@ -184,7 +213,10 @@ const Welcome = () => {
                             owner={owner}
                         />
                         <Progress progress={progress} />
-                        <WorkflowTab allVoters={allVoters} />
+                        <WorkflowTab
+                            allVoters={allVoters}
+                            allProposals={allProposals}
+                        />
                     </div>
                 </div>
                 <div className="flex flex-col flex-1 items-center justify-start w-full mf:mt-0 mt-10">
