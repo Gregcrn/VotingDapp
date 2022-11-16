@@ -26,7 +26,7 @@ export default function WorkflowTab({
             Winner: winnerProposal,
         },
     ];
-    console.log(winnerProposal);
+
     const VoteForProposal = async (proposalId) => {
         return await contract.methods
             .setVote(proposalId)
@@ -64,27 +64,27 @@ export default function WorkflowTab({
                             )}
                         >
                             <ul>
-                                {data?.map((voter, i) => {
-                                    if (data) {
-                                        return (
-                                            <VotersListing
-                                                key={i}
-                                                addressOfVoter={voter.address}
-                                                proposalOfVoter={
-                                                    voter.description
-                                                }
-                                                voteCount={voter.voteCount}
-                                                idOfProposal={voter.id}
-                                                winnerProposalId={
-                                                    voter.idOfWinner
-                                                }
-                                                VoteFortheProposal={() =>
-                                                    VoteForProposal(voter.id)
-                                                }
-                                            />
-                                        );
-                                    }
-                                })}
+                                {Array.isArray(data)
+                                    ? data.map((voter, i) => {
+                                          return (
+                                              <VotersListing
+                                                  key={i}
+                                                  addressOfVoter={voter.address}
+                                                  proposalOfVoter={
+                                                      voter.description
+                                                  }
+                                                  voteCount={voter.voteCount}
+                                                  idOfProposal={voter.id}
+                                                  winnerProposalId={
+                                                      voter.idOfWinner
+                                                  }
+                                                  VoteFortheProposal={() =>
+                                                      VoteForProposal(voter.id)
+                                                  }
+                                              />
+                                          );
+                                      })
+                                    : null}
                             </ul>
                         </Tab.Panel>
                     ))}
