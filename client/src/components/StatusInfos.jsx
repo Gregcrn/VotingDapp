@@ -1,39 +1,19 @@
 import React from 'react';
-import { useEffect } from 'react';
-import useEth from '../contexts/EthContext/useEth';
 
 const StatusInfos = ({
     rawStatus,
     currentStatusDesc,
     nextStatusDescription,
-    owner,
     isOwner,
+    startProposalsRegistering,
+    endProposalsRegistering,
+    startVotingSession,
+    endVotingSession,
+    startResultsSession,
 }) => {
-    const {
-        state: { contract },
-    } = useEth();
-
-    async function startProposalsRegistering() {
-        return await contract.methods
-            .startProposalsRegistering()
-            .send({ from: owner });
-    }
-    async function endProposalsRegistering() {
-        return await contract.methods
-            .endProposalsRegistering()
-            .send({ from: owner });
-    }
-    async function startVotingSession() {
-        return await contract.methods
-            .startVotingSession()
-            .send({ from: owner });
-    }
-    async function endVotingSession() {
-        return await contract.methods.endVotingSession().send({ from: owner });
-    }
-    async function startResultsSession() {
-        return await contract.methods.tallyVotes().send({ from: owner });
-    }
+    console.log(currentStatusDesc);
+    console.log(nextStatusDescription);
+    console.log(rawStatus);
     return (
         <div className="w-full">
             <p className="text-lg text-slate-300 text-left underline decoration-pink-500/30 decoration-4 mb-3 ">

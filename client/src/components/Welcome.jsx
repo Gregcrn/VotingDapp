@@ -53,47 +53,7 @@ const Welcome = () => {
                 setCurrentAccount(await accounts[0]);
             }
         }
-        async function getStatus() {
-            if (contract) {
-                const status = parseInt(
-                    await contract.methods.workflowStatus().call()
-                );
-                setCurrentStatusDesc(status);
-                setCurrentStatus(status);
-                switch (status) {
-                    case 0:
-                        setCurrentStatusDesc('Registering of voters');
-                        setProgress(1);
-                        setNextStatus('Opening of the proposal session');
-                        break;
-                    case 1:
-                        setCurrentStatusDesc('Proposals registration');
-                        setProgress(16);
-                        setNextStatus('Closing of the proposal session');
-                        break;
-                    case 2:
-                        setCurrentStatusDesc('End of proposals registration');
-                        setProgress(33);
-                        setNextStatus('Opening of the voting session');
-                        break;
-                    case 3:
-                        setCurrentStatusDesc('Voting session started');
-                        setProgress(50);
-                        setNextStatus('Closing of the voting session');
-                        break;
-                    case 4:
-                        setCurrentStatusDesc('Voting session ended');
-                        setProgress(66);
-                        setNextStatus('Opening of the results session');
-                        break;
-                    case 5:
-                        setCurrentStatusDesc('Session votes tallied');
-                        setProgress(100);
-                        setNextStatus('End of the voting session');
-                        setIsEnded(true);
-                }
-            }
-        }
+
         getStatus();
         getOwner();
         currentAccount();
@@ -182,6 +142,86 @@ const Welcome = () => {
             setAllProposals(proposals);
         }
     }
+    async function getStatus() {
+        if (contract) {
+            const status = parseInt(
+                await contract.methods.workflowStatus().call()
+            );
+            setCurrentStatusDesc(status);
+            setCurrentStatus(status);
+            setProgress(1);
+            switch (status) {
+                case 0:
+                    setCurrentStatusDesc('Registering of voters');
+                    setProgress(1);
+                    setNextStatus('Opening of the proposal session');
+                    break;
+                case 1:
+                    setCurrentStatusDesc('Proposals registration');
+                    setProgress(16);
+                    setNextStatus('Closing of the proposal session');
+                    break;
+                case 2:
+                    setCurrentStatusDesc('End of proposals registration');
+                    setProgress(33);
+                    setNextStatus('Opening of the voting session');
+                    break;
+                case 3:
+                    setCurrentStatusDesc('Voting session started');
+                    setProgress(50);
+                    setNextStatus('Closing of the voting session');
+                    break;
+                case 4:
+                    setCurrentStatusDesc('Voting session ended');
+                    setProgress(66);
+                    setNextStatus('Opening of the results session');
+                    break;
+                case 5:
+                    setCurrentStatusDesc('Session votes tallied');
+                    setProgress(100);
+                    setNextStatus('End of the voting session');
+                    setIsEnded(true);
+            }
+        }
+    }
+
+    async function startProposalsRegistering() {
+        await contract.methods
+            .startProposalsRegistering()
+            .send({ from: owner });
+        setCurrentStatusDesc('Proposals registration');
+        setProgress(16);
+        setNextStatus('Closing of the proposal session');
+        getStatus();
+    }
+    async function endProposalsRegistering() {
+        await contract.methods.endProposalsRegistering().send({ from: owner });
+        setCurrentStatusDesc('End of proposals registration');
+        setProgress(33);
+        setNextStatus('Opening of the voting session');
+        getStatus();
+    }
+    async function startVotingSession() {
+        await contract.methods.startVotingSession().send({ from: owner });
+        setCurrentStatusDesc('Voting session started');
+        setProgress(50);
+        setNextStatus('Closing of the voting session');
+        getStatus();
+    }
+    async function endVotingSession() {
+        await contract.methods.endVotingSession().send({ from: owner });
+        setCurrentStatusDesc('Voting session ended');
+        setProgress(66);
+        setNextStatus('Opening of the results session');
+        getStatus();
+    }
+    async function startResultsSession() {
+        await contract.methods.tallyVotes().send({ from: owner });
+        setCurrentStatusDesc('Session votes tallied');
+        setProgress(100);
+        setNextStatus('End of the voting session');
+        getStatus();
+    }
 
     const getResult = async () => {
         const winner = await contract.methods.winningProposalID().call();
@@ -220,6 +260,13 @@ const Welcome = () => {
                             rawStatus={currentStatus}
                             owner={owner}
                             isOwner={isOwner}
+                            startProposalsRegistering={
+                                startProposalsRegistering
+                            }
+                            endProposalsRegistering={endProposalsRegistering}
+                            startVotingSession={startVotingSession}
+                            endVotingSession={endVotingSession}
+                            startResultsSession={startResultsSession}
                         />
                         <Progress progress={progress} />
                         <WorkflowTab
