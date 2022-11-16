@@ -1,27 +1,37 @@
+import useEth from '../contexts/EthContext/useEth';
+
+import { useEffect, useState } from 'react';
+
 import { Tab } from '@headlessui/react';
 import VotersListing from './VotersListing';
-
-import useEth from '../contexts/EthContext/useEth';
-import { useEffect, useState } from 'react';
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(' ');
 }
 
-export default function WorkflowTab({ allVoters, allProposals }) {
+export default function WorkflowTab({
+    allVoters,
+    allProposals,
+    currentVoter,
+    winnerProposal,
+}) {
+    const {
+        state: { contract },
+    } = useEth();
+
     let [process] = [
         {
             Voters: allVoters,
             Proposal: allProposals,
-            Winner: [],
+            Winner: winnerProposal,
         },
     ];
-
-    console.log(allProposals);
-
-    async function VoteFortheProposal() {
-        console.log(allProposals);
-    }
+    console.log(winnerProposal);
+    const VoteForProposal = async (proposalId) => {
+        return await contract.methods
+            .setVote(proposalId)
+            .send({ from: currentVoter });
+    };
 
     return (
         <div className="w-full max-w-xl px-2 py-1 mt-7 ">
@@ -64,8 +74,12 @@ export default function WorkflowTab({ allVoters, allProposals }) {
                                                     voter.description
                                                 }
                                                 voteCount={voter.voteCount}
-                                                VoteFortheProposal={
-                                                    VoteFortheProposal
+                                                idOfProposal={voter.id}
+                                                winnerProposalId={
+                                                    voter.idOfWinner
+                                                }
+                                                VoteFortheProposal={() =>
+                                                    VoteForProposal(voter.id)
                                                 }
                                             />
                                         );

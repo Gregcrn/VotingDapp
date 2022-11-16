@@ -11,6 +11,7 @@ import StatusInfos from './StatusInfos';
 import OwnerForm from './OwnerForm';
 import VoterForm from './VoterForm';
 import NotRegistered from './NotRegistered';
+import TallVotes from './TallVotes';
 
 // utils
 import { isInList } from '../utils/contractUtils';
@@ -33,6 +34,8 @@ const Welcome = () => {
     const [isVoter, setIsVoter] = useState(false);
     const [proposalOfVoter, setProposalOfVoter] = useState('');
     const [allProposals, setAllProposals] = useState();
+    const [isEnded, setIsEnded] = useState(false);
+    const [winnerProposal, setWinnerProposal] = useState('');
 
     const {
         state: { contract, accounts },
@@ -57,6 +60,38 @@ const Welcome = () => {
                 );
                 setCurrentStatusDesc(status);
                 setCurrentStatus(status);
+                switch (status) {
+                    case 0:
+                        setCurrentStatusDesc('Registering of voters');
+                        setProgress(1);
+                        setNextStatus('Opening of the proposal session');
+                        break;
+                    case 1:
+                        setCurrentStatusDesc('Proposals registration');
+                        setProgress(16);
+                        setNextStatus('Closing of the proposal session');
+                        break;
+                    case 2:
+                        setCurrentStatusDesc('End of proposals registration');
+                        setProgress(33);
+                        setNextStatus('Opening of the voting session');
+                        break;
+                    case 3:
+                        setCurrentStatusDesc('Voting session started');
+                        setProgress(50);
+                        setNextStatus('Closing of the voting session');
+                        break;
+                    case 4:
+                        setCurrentStatusDesc('Voting session ended');
+                        setProgress(66);
+                        setNextStatus('Opening of the results session');
+                        break;
+                    case 5:
+                        setCurrentStatusDesc('Session votes tallied');
+                        setProgress(100);
+                        setNextStatus('End of the voting session');
+                        setIsEnded(true);
+                }
             }
         }
         getStatus();
@@ -80,40 +115,6 @@ const Welcome = () => {
             }
         }
     }, [currentAccount, owner, contract, accounts]);
-
-    useEffect(() => {
-        switch (currentStatusDesc) {
-            case 0:
-                setCurrentStatusDesc('Registering of voters');
-                setProgress(1);
-                setNextStatus('Opening of the proposal session');
-                break;
-            case 1:
-                setCurrentStatusDesc('Proposals registration');
-                setProgress(16);
-                setNextStatus('Closing of the proposal session');
-                break;
-            case 2:
-                setCurrentStatusDesc('End of proposals registration');
-                setProgress(33);
-                setNextStatus('Opening of the voting session');
-                break;
-            case 3:
-                setCurrentStatusDesc('Voting session started');
-                setProgress(50);
-                setNextStatus('Closing of the voting session');
-                break;
-            case 4:
-                setCurrentStatusDesc('Voting session ended');
-                setProgress(66);
-                setNextStatus('Opening of the results session');
-                break;
-            case 5:
-                setCurrentStatusDesc('Session votes tallied');
-                setProgress(100);
-                setNextStatus('End of the voting session');
-        }
-    }, [currentStatusDesc]);
 
     async function getvoters() {
         if (contract) {
@@ -153,6 +154,7 @@ const Welcome = () => {
                 from: currentAccount,
             });
             setProposalOfVoter('');
+            getAllProposals();
         }
     };
 
@@ -162,20 +164,17 @@ const Welcome = () => {
 
     async function getAllProposals() {
         if (contract) {
-            let allProposals = await contract.getPastEvents(
-                'ProposalRegistered',
-                {
-                    fromBlock: 0,
-                    toBlock: 'latest',
-                }
-            );
+            let propsals = await contract.getPastEvents('ProposalRegistered', {
+                fromBlock: 0,
+                toBlock: 'latest',
+            });
             let proposals = [];
-            for (const proposalEvent of allProposals) {
+            for (const proposalEvent of propsals) {
                 const proposal = await getProposal(
                     proposalEvent.returnValues.proposalId
                 );
                 proposals.push({
-                    id: proposal,
+                    id: proposalEvent.returnValues.proposalId,
                     description: proposal.description,
                     voteCount: proposal.voteCount,
                 });
@@ -183,6 +182,15 @@ const Welcome = () => {
             setAllProposals(proposals);
         }
     }
+
+    const getResult = async () => {
+        const winner = await contract.methods.winningProposalID().call();
+        setWinnerProposal(winner);
+        const winnerP = allProposals.filter((proposal) => {
+            return proposal.id === winner;
+        });
+        setWinnerProposal(winnerP);
+    };
 
     const handleChange = (e) => {
         e.preventDefault();
@@ -211,11 +219,14 @@ const Welcome = () => {
                             nextStatusDescription={nextStatusDescription}
                             rawStatus={currentStatus}
                             owner={owner}
+                            isOwner={isOwner}
                         />
                         <Progress progress={progress} />
                         <WorkflowTab
                             allVoters={allVoters}
                             allProposals={allProposals}
+                            currentVoter={currentAccount}
+                            winnerProposal={winnerProposal}
                         />
                     </div>
                 </div>
@@ -247,10 +258,19 @@ const Welcome = () => {
                                 name="addressOfVoter"
                                 handleChange={handleChange}
                                 addVoter={addVoter}
+                                isEnded={isEnded}
+                                countingVotes={getResult}
                             />
                         </>
                     ) : null}
-                    {isVoter ? (
+                    {isVoter &&
+                    currentStatus !== 2 &&
+                    isVoter &&
+                    currentStatus !== 3 &&
+                    isVoter &&
+                    currentStatus !== 4 &&
+                    isVoter &&
+                    currentStatus !== 5 ? (
                         <>
                             <VoterForm
                                 placeholder="Enter your proposal"

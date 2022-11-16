@@ -5,7 +5,9 @@ const VotersListing = ({
     addressOfVoter,
     proposalOfVoter,
     voteCount,
+    idOfProposal,
     VoteFortheProposal,
+    winnerProposalId,
 }) => {
     return (
         <>
@@ -26,9 +28,22 @@ const VotersListing = ({
                             <p className="text-sm text-gray-500 truncate dark:text-gray-400">
                                 {addressOfVoter}
                             </p>
-                            {proposalOfVoter && (
+                            {proposalOfVoter && !winnerProposalId && (
                                 <p className="tex-md text-gray-500 truncate dark:text-gray-400">
-                                    {proposalOfVoter}
+                                    Proposition n° : {idOfProposal} -{' '}
+                                    <span className="text-emerald-500">
+                                        {proposalOfVoter}
+                                    </span>
+                                </p>
+                            )}
+                            {winnerProposalId && (
+                                <p className="tex-md text-gray-500 truncate dark:text-gray-400">
+                                    Winner Proposition n° : {winnerProposalId}{' '}
+                                    <span className="text-emerald-500">
+                                        {proposalOfVoter}
+                                    </span>
+                                    <br />
+                                    Congratulations !
                                 </p>
                             )}
                             {proposalOfVoter && voteCount && (
