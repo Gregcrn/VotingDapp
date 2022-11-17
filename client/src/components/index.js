@@ -1,5 +1,5 @@
-export {default as Navbar} from './Navbar'
+export {default as Navbar} from './Navbar/Navbar'
 export {default as Welcome} from './Welcome'
 export {default as Interface} from './Interface'
-export {default as NoticeWrongNetwork} from './NoticeWrongNetwork'
-export {default as NoticeNoArtifact} from './NoticeNoArtifact'
+export {default as NoticeWrongNetwork} from './Notice/NoticeWrongNetwork'
+export {default as NoticeNoArtifact} from './Notice/NoticeNoArtifact'

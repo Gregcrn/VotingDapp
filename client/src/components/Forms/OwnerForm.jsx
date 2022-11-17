@@ -1,5 +1,5 @@
 import React from 'react';
-import TallVotes from './TallVotes';
+import TallVotes from '../Workflow/TallVotes';
 
 const OwnerForm = ({
     handleChange,
@@ -10,6 +10,7 @@ const OwnerForm = ({
     name,
     isEnded,
     countingVotes,
+    currentStatus,
 }) => {
     return (
         <div className="p-5 sm:w-96 w-full flex flex-col justify-start items-center blue-glassmorphism">
@@ -19,7 +20,7 @@ const OwnerForm = ({
                 </span>{' '}
             </h1>
 
-            {!isEnded && (
+            {!isEnded && currentStatus === 0 && (
                 <>
                     <p className="text-md font-normal text-gray-500 lg:text-xl dark:text-gray-400">
                         Enter the address of voter
@@ -40,6 +41,11 @@ const OwnerForm = ({
                         Add Voter
                     </button>
                 </>
+            )}
+            {currentStatus !== 0 && (
+                <p className="text-md font-normal text-gray-500 lg:text-xl dark:text-gray-400">
+                    Wait process is going on
+                </p>
             )}
             {isEnded && <TallVotes TallVotes={countingVotes} />}
         </div>

@@ -1,4 +1,4 @@
-import useEth from '../contexts/EthContext/useEth';
+// import useEth from '../contexts/EthContext/useEth';
 
 import { useEffect, useState } from 'react';
 
@@ -12,13 +12,37 @@ function classNames(...classes) {
 export default function WorkflowTab({
     allVoters,
     allProposals,
-    // currentVoter,
+    currentStatus,
     winnerProposal,
     voteForProposal,
+    isOwner,
 }) {
-    const {
-        state: { contract },
-    } = useEth();
+    const [selectedIndex, setSelectedIndex] = useState(0);
+
+    useEffect(() => {
+        switch (currentStatus) {
+            case 0:
+                setSelectedIndex(0);
+                break;
+            case 1:
+                setSelectedIndex(1);
+                break;
+            case 2:
+                setSelectedIndex(1);
+                break;
+            case 3:
+                setSelectedIndex(1);
+                break;
+            case 4:
+                setSelectedIndex(1);
+                break;
+            case 5:
+                setSelectedIndex(2);
+                break;
+            default:
+                break;
+        }
+    }, [currentStatus]);
 
     let [process] = [
         {
@@ -28,15 +52,12 @@ export default function WorkflowTab({
         },
     ];
 
-    // const VoteForProposal = async (proposalId) => {
-    //     return await contract.methods
-    //         .setVote(proposalId)
-    //         .send({ from: currentVoter });
-    // };
-
     return (
         <div className="w-full max-w-xl px-2 py-1 mt-7 ">
-            <Tab.Group>
+            <Tab.Group
+                selectedIndex={selectedIndex}
+                onChange={setSelectedIndex}
+            >
                 <Tab.List className="flex space-x-1 rounded-xl bg-blue-900/20 p-1">
                     {Object.keys(process).map((step) => (
                         <Tab
@@ -82,6 +103,8 @@ export default function WorkflowTab({
                                                   VoteFortheProposal={() =>
                                                       voteForProposal(voter.id)
                                                   }
+                                                  isOwner={isOwner}
+                                                  currentStatus={currentStatus}
                                               />
                                           );
                                       })

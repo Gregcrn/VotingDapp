@@ -1,21 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import useEth from '../contexts/EthContext/useEth';
-
+// Icons
 import { AiOutlineAntCloud } from 'react-icons/ai';
 import { SiEthereum } from 'react-icons/si';
 import { BsInfoCircle } from 'react-icons/bs';
 // Component
-import Progress from './Progress';
-import WorkflowTab from './WorkflowTab';
-import StatusInfos from './StatusInfos';
-import OwnerForm from './OwnerForm';
-import VoterForm from './VoterForm';
-import NotRegistered from './NotRegistered';
-import TallVotes from './TallVotes';
+import Progress from './Process/Progress';
+import WorkflowTab from './Workflow/WorkflowTab';
+import StatusInfos from './Process/StatusInfos';
+import OwnerForm from './Forms/OwnerForm';
+import VoterForm from './Forms/VoterForm';
+import NotRegistered from './Forms/NotRegistered';
 
 // utils
 import { isInList } from '../utils/contractUtils';
-
 import { shortenAddress } from '../utils/shortenAddress';
 
 const companyCommonStyles =
@@ -33,6 +31,7 @@ const Welcome = () => {
     const [nextStatusDescription, setNextStatus] = useState('');
     const [isVoter, setIsVoter] = useState(false);
     const [proposalOfVoter, setProposalOfVoter] = useState('');
+    const [hasVoted, setHasVoted] = useState();
     const [allProposals, setAllProposals] = useState();
     const [isEnded, setIsEnded] = useState(false);
     const [winnerProposal, setWinnerProposal] = useState('');
@@ -91,6 +90,7 @@ const Welcome = () => {
             setAllVoters(voters);
         }
     }
+
     //----------------------- ADD VOTER -----------------------//
     const addVoter = async () => {
         if (addressOfVoter === '') {
@@ -227,7 +227,7 @@ const Welcome = () => {
     const VoteForProposal = async (proposalId) => {
         return await contract.methods
             .setVote(proposalId)
-            .send({ from: currentVoter });
+            .send({ from: currentAccount });
     };
     // -----------------------GET RESULT-----------------------//
     const getResult = async () => {
@@ -248,7 +248,6 @@ const Welcome = () => {
         e.preventDefault();
         setProposalOfVoter(e.currentTarget.value);
     };
-
     return (
         <>
             <div className="flex w-full justify-center items-center">
@@ -282,6 +281,8 @@ const Welcome = () => {
                             currentVoter={currentAccount}
                             winnerProposal={winnerProposal}
                             voteForProposal={VoteForProposal}
+                            isOwner={isOwner}
+                            currentStatus={currentStatus}
                         />
                     </div>
                 </div>
@@ -315,6 +316,7 @@ const Welcome = () => {
                                 addVoter={addVoter}
                                 isEnded={isEnded}
                                 countingVotes={getResult}
+                                currentStatus={currentStatus}
                             />
                         </>
                     ) : null}

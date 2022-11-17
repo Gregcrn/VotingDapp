@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import useEth from '../contexts/EthContext/useEth';
+import useEth from '../../contexts/EthContext/useEth';
 import { HiMenuAlt4 } from 'react-icons/hi';
 import { AiOutlineClose } from 'react-icons/ai';
 
-import logo from '../assets/logo.png';
+import logo from '../../assets/logo.png';
 
 const NavBarItem = ({ title, classprops }) => (
     <li className={`mx-4 cursor-pointer ${classprops}`}>{title}</li>
