@@ -75,7 +75,7 @@ const Welcome = () => {
             }
         }
     }, [currentAccount, owner, contract, accounts]);
-
+    //----------------------- Get all voters -----------------------//
     async function getvoters() {
         if (contract) {
             let allVoters = await contract.getPastEvents('VoterRegistered', {
@@ -91,7 +91,7 @@ const Welcome = () => {
             setAllVoters(voters);
         }
     }
-
+    //----------------------- ADD VOTER -----------------------//
     const addVoter = async () => {
         if (addressOfVoter === '') {
             alert('Please enter a valid address');
@@ -104,7 +104,7 @@ const Welcome = () => {
             getvoters();
         }
     };
-
+    //----------------------- ADD PROPOSAL -----------------------//
     const addProposal = async () => {
         if (proposalOfVoter === '') {
             alert('Please enter a valid proposal');
@@ -117,11 +117,11 @@ const Welcome = () => {
             getAllProposals();
         }
     };
-
+    // ----------------------- GET PROPOSAL -----------------------//
     async function getProposal(idProposal) {
         return await contract.methods.proposalsArray(idProposal).call();
     }
-
+    //----------------------- GET ALL PROPOSALS -----------------------//
     async function getAllProposals() {
         if (contract) {
             let propsals = await contract.getPastEvents('ProposalRegistered', {
@@ -142,6 +142,7 @@ const Welcome = () => {
             setAllProposals(proposals);
         }
     }
+    //----------------------- GET STATUS -----------------------//
     async function getStatus() {
         if (contract) {
             const status = parseInt(
@@ -184,7 +185,7 @@ const Welcome = () => {
             }
         }
     }
-
+    //-----------------------SESSION-----------------------//
     async function startProposalsRegistering() {
         await contract.methods
             .startProposalsRegistering()
@@ -222,7 +223,13 @@ const Welcome = () => {
         setNextStatus('End of the voting session');
         getStatus();
     }
-
+    // -----------------------VOTE FOR PROPOSAL-----------------------//
+    const VoteForProposal = async (proposalId) => {
+        return await contract.methods
+            .setVote(proposalId)
+            .send({ from: currentVoter });
+    };
+    // -----------------------GET RESULT-----------------------//
     const getResult = async () => {
         const winner = await contract.methods.winningProposalID().call();
         setWinnerProposal(winner);
@@ -231,7 +238,7 @@ const Welcome = () => {
         });
         setWinnerProposal(winnerP);
     };
-
+    // -----------------------HANDLECHANGE INPUT-----------------------//
     const handleChange = (e) => {
         e.preventDefault();
         setAddressOfVoter(e.currentTarget.value);
@@ -274,6 +281,7 @@ const Welcome = () => {
                             allProposals={allProposals}
                             currentVoter={currentAccount}
                             winnerProposal={winnerProposal}
+                            voteForProposal={VoteForProposal}
                         />
                     </div>
                 </div>

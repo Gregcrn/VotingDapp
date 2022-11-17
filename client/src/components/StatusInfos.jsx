@@ -11,9 +11,6 @@ const StatusInfos = ({
     endVotingSession,
     startResultsSession,
 }) => {
-    console.log(currentStatusDesc);
-    console.log(nextStatusDescription);
-    console.log(rawStatus);
     return (
         <div className="w-full">
             <p className="text-lg text-slate-300 text-left underline decoration-pink-500/30 decoration-4 mb-3 ">

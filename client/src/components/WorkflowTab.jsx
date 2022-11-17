@@ -12,8 +12,9 @@ function classNames(...classes) {
 export default function WorkflowTab({
     allVoters,
     allProposals,
-    currentVoter,
+    // currentVoter,
     winnerProposal,
+    voteForProposal,
 }) {
     const {
         state: { contract },
@@ -27,11 +28,11 @@ export default function WorkflowTab({
         },
     ];
 
-    const VoteForProposal = async (proposalId) => {
-        return await contract.methods
-            .setVote(proposalId)
-            .send({ from: currentVoter });
-    };
+    // const VoteForProposal = async (proposalId) => {
+    //     return await contract.methods
+    //         .setVote(proposalId)
+    //         .send({ from: currentVoter });
+    // };
 
     return (
         <div className="w-full max-w-xl px-2 py-1 mt-7 ">
@@ -79,7 +80,7 @@ export default function WorkflowTab({
                                                       voter.idOfWinner
                                                   }
                                                   VoteFortheProposal={() =>
-                                                      VoteForProposal(voter.id)
+                                                      voteForProposal(voter.id)
                                                   }
                                               />
                                           );
