@@ -19841,6 +19841,12 @@
     "version": "0.8.17+commit.8df45f5f.Emscripten.clang"
   },
   "networks": {
+    "5": {
+      "events": {},
+      "links": {},
+      "address": "0x8D747090Fca1a7b5441B90B40854fE6Eb1A1Dd06",
+      "transactionHash": "0x31572f3f22da858a55cbffd384d5124767d6f2b9426dc75af81a0d61ca6d7df8"
+    },
     "5777": {
       "events": {
         "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0": {
@@ -20137,7 +20143,7 @@
     }
   },
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-11-17T23:49:38.996Z",
+  "updatedAt": "2022-11-18T21:59:15.354Z",
   "networkType": "ethereum",
   "devdoc": {
     "author": "https://github.com/Gregcrn",
